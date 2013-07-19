@@ -107,12 +107,6 @@ def cleanup(cf, container):
 
 if __name__ == "__main__":
 
-    # Setup pyrax connection handler
-    pyrax.set_setting("identity_type", "rackspace")
-    pyrax.set_setting("region", "ORD")
-    pyrax.set_credential_file(".pyrax_creds")
-    cf = pyrax.cloudfiles
-
     # Command line arguments
     description = "Benchmark Cloud Files."
     parser = argparse.ArgumentParser(description=description)
@@ -123,7 +117,15 @@ if __name__ == "__main__":
                         help='Number of tests to perform.')
     parser.add_argument('-c', '--chunk', type=int, default=8192,
                         help='Chunk size for objects')
+    parser.add_argument('-r', '--region', type=str, default='ORD',
+                        help='Cloud Files region for the tests.')
     args = parser.parse_args()
+
+    # Setup pyrax connection handler
+    pyrax.set_setting("identity_type", "rackspace")
+    pyrax.set_setting("region", args.region)
+    pyrax.set_credential_file(".pyrax_creds")
+    cf = pyrax.cloudfiles
 
     # Testing variables
     container = args.container
