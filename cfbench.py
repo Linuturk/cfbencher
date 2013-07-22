@@ -55,7 +55,7 @@ def upload_benchmark(cf, container, length, n):
     for i in range(0, n):
         upload_random_obj(cf, container, length)
     end = time.time()
-    total_obj = n * len(lengths)
+    total_obj = n
     seconds = end - start
     print("Uploaded {0} objects in {1} seconds.".format(total_obj, seconds))
     print("{0} objects per second.".format(total_obj / seconds))
