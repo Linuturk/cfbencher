@@ -47,14 +47,13 @@ def fetch_random_obj(cf, container):
     return obj
 
 
-def upload_benchmark(cf, container, lengths, n):
+def upload_benchmark(cf, container, length, n):
     '''
     Upload n number of objects to a container.
     '''
     start = time.time()
-    for length in lengths:
-        for i in range(0, n):
-            upload_random_obj(cf, container, length)
+    for i in range(0, n):
+        upload_random_obj(cf, container, length)
     end = time.time()
     total_obj = n * len(lengths)
     seconds = end - start
@@ -116,7 +115,9 @@ if __name__ == "__main__":
     parser.add_argument('-n', '--count', type=int, default=10,
                         help='Number of tests to perform.')
     parser.add_argument('-c', '--chunk', type=int, default=8192,
-                        help='Chunk size for objects')
+                        help='Chunk size for objects.')
+    parser.add_argument('-m', '--multi', type=int, default=100,
+                        help='Chunk * Multi = Total Object Size.')
     parser.add_argument('-r', '--region', type=str, default='ORD',
                         help='Cloud Files region for the tests.')
     args = parser.parse_args()
@@ -130,14 +131,14 @@ if __name__ == "__main__":
     # Testing variables
     container = args.container
     count = args.count
-    lengths = [args.chunk*10, args.chunk*100]
+    length = args.chunk * args.multi
 
     # Test connection
     connection_test(cf, pyrax.utils.random_name(ascii_only=True))
 
     if args.test == 'upload':
         # Generate some random objects
-        upload_benchmark(cf, container, lengths, count)
+        upload_benchmark(cf, container, length, count)
     elif args.test == 'fetch':
         # Fetch random objects
         fetch_benchmark(cf, container, count)
