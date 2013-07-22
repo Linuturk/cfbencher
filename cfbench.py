@@ -127,7 +127,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Logging
-    logging.basicConfig(filename='cfbench.log', level=logging.INFO)
+    formatting = '%(asctime)s:%(levelname)s:%(message)s'
+    logging.basicConfig(filename='cfbench.log', level=logging.INFO,
+                        format=formatting)
 
     # Setup pyrax connection handler
     pyrax.set_setting("identity_type", "rackspace")
