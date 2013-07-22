@@ -5,6 +5,7 @@ import pyrax
 import time
 import random
 import argparse
+import logging
 
 
 def connection_test(cf, container):
@@ -15,11 +16,11 @@ def connection_test(cf, container):
     try:
         cf.create_container(container)
     except:
-        print("Container creation failed.")
+        log.error("Container creation failed.")
     try:
         cf.delete_container(container)
     except:
-        print("Container deletion failed.")
+        log.error("Container deletion failed.")
 
 
 def upload_random_obj(cf, container, length):
@@ -30,10 +31,10 @@ def upload_random_obj(cf, container, length):
     text = pyrax.utils.random_name(length=length)
     name = pyrax.utils.random_name(ascii_only=True)
     chksum = pyrax.utils.get_checksum(text)
-    print("Uploading: {0}".format(name))
+    log.debug("Uploading: {0}".format(name))
     obj = cf.store_object(container, name, text, etag=chksum)
     if chksum != obj.etag:
-        print("Checksum Mismatch!")
+        log.error("Checksum Mismatch!")
 
 
 def fetch_random_obj(cf, container):
@@ -57,8 +58,8 @@ def upload_benchmark(cf, container, length, n):
     end = time.time()
     total_obj = n
     seconds = end - start
-    print("Uploaded {0} objects in {1} seconds.".format(total_obj, seconds))
-    print("{0} objects per second.".format(total_obj / seconds))
+    log.info("Uploaded {0} objects in {1} seconds.".format(total_obj, seconds))
+    log.info("{0} objects per second.".format(total_obj / seconds))
 
 
 def fetch_benchmark(cf, container, n, chunk_size=8192):
@@ -78,14 +79,14 @@ def fetch_benchmark(cf, container, n, chunk_size=8192):
         else:
             match = "Mismatch!"
             mismatch += 1
-        print("Fetched: {0} Chksum: {1}".format(obj.name, match))
+        log.info("Fetched: {0} Chksum: {1}".format(obj.name, match))
         count += 1
     end = time.time()
     total_obj = n
     seconds = end - start
-    print("Fetched {0} objects in {1} seconds.".format(total_obj, seconds))
-    print("{0} objects per second.".format(total_obj / seconds))
-    print("{0} mismatched checksums.".format(mismatch))
+    log.info("Fetched {0} objects in {1} seconds.".format(total_obj, seconds))
+    log.info("{0} objects per second.".format(total_obj / seconds))
+    log.info("{0} mismatched checksums.".format(mismatch))
 
 
 def cleanup(cf, container):
@@ -101,8 +102,8 @@ def cleanup(cf, container):
     cont.delete()
     end = time.time()
     seconds = end - start
-    print("Deleted {0} objects in {1} seconds".format(total_obj, seconds))
-    print("{0} objects per second.".format(total_obj / seconds))
+    log.info("Deleted {0} objects in {1} seconds".format(total_obj, seconds))
+    log.info("{0} objects per second.".format(total_obj / seconds))
 
 if __name__ == "__main__":
 
@@ -122,6 +123,15 @@ if __name__ == "__main__":
                         help='Cloud Files region for the tests.')
     args = parser.parse_args()
 
+    # Logging
+    log = logging.getLogger("cfbench")
+    log.setLevel(logging.INFO)
+    fh = logging.FileHandler("/tmp/cfbench.log")
+    form = '%(asctime)s:%(name)s:%(levelname)s:%(message)s'
+    formatter = log.Formatter(form)
+    fh.setFormatter(formatter)
+    log.addHandler(fh)
+
     # Setup pyrax connection handler
     pyrax.set_setting("identity_type", "rackspace")
     pyrax.set_setting("region", args.region)
@@ -138,10 +148,16 @@ if __name__ == "__main__":
 
     if args.test == 'upload':
         # Generate some random objects
+        log.info("Uploading {0} objects sized {1} to {2}.".format(count,
+                                                                  length,
+                                                                  container))
         upload_benchmark(cf, container, length, count)
     elif args.test == 'fetch':
         # Fetch random objects
+        log.info("Fetching {0} objects from {1}.".format(count, container))
         fetch_benchmark(cf, container, count)
     elif args.test == 'clean':
         # Cleanup our mess
+        log.info("Attempting cleanup of {0}.".format(container))
         cleanup(cf, container)
+        log.info("cleanup of {0} complete.".format(container))
