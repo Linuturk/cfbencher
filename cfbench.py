@@ -31,7 +31,7 @@ def upload_random_obj(cf, container, length):
     text = pyrax.utils.random_name(length=length)
     name = pyrax.utils.random_name(ascii_only=True)
     chksum = pyrax.utils.get_checksum(text)
-    logging.info("Uploading {0}".format(name))
+    logging.debug("Uploading {0}".format(name))
     obj = cf.store_object(container, name, text, etag=chksum)
     if chksum != obj.etag:
         logging.error("Checksum Mismatch!")
@@ -80,7 +80,7 @@ def fetch_benchmark(cf, container, n, chunk_size=8192):
         else:
             match = "Mismatch!"
             mismatch += 1
-        logging.info("Fetched {0} Chksum {1}".format(obj.name, match))
+        logging.debug("Fetched {0} Chksum {1}".format(obj.name, match))
         count += 1
     end = time.time()
     total_obj = n
@@ -126,11 +126,17 @@ if __name__ == "__main__":
                         help='Cloud Files region for the tests.')
     parser.add_argument('-l', '--log', type=str, default="/tmp/cfbench.log",
                         help='Location of the log file.')
+    parser.add_argument('-D', '--debug', type=bool,
+                        help='Set for debug logging output.')
     args = parser.parse_args()
 
     # Logging
+    if args.debug is True:
+        level = logging.DEBUG
+    else:
+        level = logging.INFO
     formatting = '%(asctime)s:%(levelname)s:%(message)s'
-    logging.basicConfig(filename=args.log, level=logging.INFO,
+    logging.basicConfig(filename=args.log, level=level,
                         format=formatting)
 
     # Setup pyrax connection handler
@@ -152,6 +158,7 @@ if __name__ == "__main__":
         logging.info("Uploading {0} objects sized {1} to {2}.".format(
             count, length, container))
         upload_benchmark(cf, container, length, count)
+        logging.info("Upload complete to {0}.".format(container))
     elif args.test == 'fetch':
         # Fetch random objects
         logging.info("Fetching {0} objects from {1}.".format(count, container))
