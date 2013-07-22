@@ -128,6 +128,8 @@ if __name__ == "__main__":
                         help='Location of the log file.')
     parser.add_argument('-D', '--debug', action='store_true',
                         help='Set for debug logging output.')
+    parser.add_argument('-C', '--config', type=str, default='.pyrax_creds',
+                        help='Config file location.')
     args = parser.parse_args()
 
     # Logging
@@ -142,7 +144,7 @@ if __name__ == "__main__":
     # Setup pyrax connection handler
     pyrax.set_setting("identity_type", "rackspace")
     pyrax.set_setting("region", args.region)
-    pyrax.set_credential_file(".pyrax_creds")
+    pyrax.set_credential_file(args.config)
     cf = pyrax.cloudfiles
 
     # Testing variables
