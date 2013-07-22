@@ -124,11 +124,13 @@ if __name__ == "__main__":
                         help='Chunk * Multi = Total Object Size.')
     parser.add_argument('-r', '--region', type=str, default='ORD',
                         help='Cloud Files region for the tests.')
+    parser.add_argument('-l', '--log', type=str, default="/tmp/cfbench.log",
+                        help='Location of the log file.')
     args = parser.parse_args()
 
     # Logging
     formatting = '%(asctime)s:%(levelname)s:%(message)s'
-    logging.basicConfig(filename='cfbench.log', level=logging.INFO,
+    logging.basicConfig(filename=args.log, level=logging.INFO,
                         format=formatting)
 
     # Setup pyrax connection handler
