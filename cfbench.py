@@ -126,7 +126,7 @@ if __name__ == "__main__":
                         help='Cloud Files region for the tests.')
     parser.add_argument('-l', '--log', type=str, default="/tmp/cfbench.log",
                         help='Location of the log file.')
-    parser.add_argument('-D', '--debug', type=bool,
+    parser.add_argument('-D', '--debug', action='store_true',
                         help='Set for debug logging output.')
     args = parser.parse_args()
 
