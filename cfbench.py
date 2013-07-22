@@ -31,7 +31,7 @@ def upload_random_obj(cf, container, length):
     text = pyrax.utils.random_name(length=length)
     name = pyrax.utils.random_name(ascii_only=True)
     chksum = pyrax.utils.get_checksum(text)
-    logging.debug("Uploading: {0}".format(name))
+    logging.info("Uploading: {0}".format(name))
     obj = cf.store_object(container, name, text, etag=chksum)
     if chksum != obj.etag:
         logging.error("Checksum Mismatch!")
@@ -156,4 +156,4 @@ if __name__ == "__main__":
         # Cleanup our mess
         logging.info("Attempting cleanup of {0}.".format(container))
         cleanup(cf, container)
-        logging.info("cleanup of {0} complete.".format(container))
+        logging.info("Cleanup of {0} complete.".format(container))
