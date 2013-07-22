@@ -80,7 +80,7 @@ def fetch_benchmark(cf, container, n, chunk_size=8192):
         else:
             match = "Mismatch!"
             mismatch += 1
-        logging.info("Fetched: {0} Chksum: {1}".format(obj.name, match))
+        logging.info("Fetched {0} Chksum {1}".format(obj.name, match))
         count += 1
     end = time.time()
     total_obj = n
