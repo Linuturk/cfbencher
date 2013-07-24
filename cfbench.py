@@ -69,13 +69,17 @@ def fetch_benchmark(cf, container, n, chunk_size=8192):
     '''
     start = time.time()
     count = 0
+    mismatch = 0
     while count < n:
         try:
             obj = fetch_random_obj(cf, container)
             obj_gen = obj.fetch(chunk_size=chunk_size)
             output = "".join(obj_gen)
+            chksum = pyrax.utils.get_checksum(output)
             logging.debug("Fetched {0}".format(obj.name))
-            logging.debug("Contents {0}".format(output))
+            if chksum != obj.etag:
+                mismatch += 1
+                logging.error("Checksum mismatch!")
             count += 1
         except:
             logging.exception("!!!Exception!!!", exc_info=True)
@@ -85,6 +89,7 @@ def fetch_benchmark(cf, container, n, chunk_size=8192):
     logging.info("Fetched {0} objects in {1} seconds.".format(
         total_obj, seconds))
     logging.info("{0} objects per second.".format(total_obj / seconds))
+    logging.info("{0} mismatched checksums.".format(mismatch))
 
 
 def cleanup(cf, container):
