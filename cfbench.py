@@ -8,21 +8,6 @@ import argparse
 import logging
 
 
-def connection_test(cf, container):
-    '''
-    Test connection by getting metadata and creating a test
-    container.
-    '''
-    try:
-        cf.create_container(container)
-    except:
-        logging.error("Container creation failed.")
-    try:
-        cf.delete_container(container)
-    except:
-        logging.error("Container deletion failed.")
-
-
 def upload_random_obj(cf, container, length):
     '''
     Generate n random objects and upload to container.
@@ -152,9 +137,6 @@ if __name__ == "__main__":
     container = args.container
     count = args.count
     length = args.chunk * args.multi
-
-    # Test connection
-    connection_test(cf, pyrax.utils.random_name(ascii_only=True))
 
     if args.test == 'upload':
         # Generate some random objects
