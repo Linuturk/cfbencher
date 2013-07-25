@@ -42,9 +42,8 @@ def upload_benchmark(cf, container, length, n):
     end = time.time()
     total_obj = n
     seconds = end - start
-    logging.info("Uploaded {0} objects in {1} seconds.".format(
-        total_obj, seconds))
-    logging.info("{0} objects per second.".format(total_obj / seconds))
+    logging.info("Uploaded {0} objects in {1} seconds. {2} obj/s.".format(
+        total_obj, seconds, total_obj / seconds))
 
 
 def fetch_benchmark(cf, container, n, chunk_size=8192):
@@ -62,17 +61,16 @@ def fetch_benchmark(cf, container, n, chunk_size=8192):
             chksum = pyrax.utils.get_checksum(output)
             if chksum != obj.etag:
                 mismatch += 1
-                logging.error("Checksum mismatch!")
+                logging.error("Checksum mismatch! {0}".format(obj.name))
             count += 1
         except:
             logging.exception("!!!Exception!!!", exc_info=True)
     end = time.time()
     total_obj = n
     seconds = end - start
-    logging.info("Fetched {0} objects in {1} seconds.".format(
-        total_obj, seconds))
-    logging.info("{0} objects per second.".format(total_obj / seconds))
-    logging.info("{0} mismatched checksums.".format(mismatch))
+    log_text = "Uploaded {0} objects in {1} seconds. {2} obj/s. {3} mismatch!"
+    logging.info(log_text.format(total_obj, seconds, total_obj / seconds,
+                                 mismatch))
 
 
 def cleanup(cf, container):
