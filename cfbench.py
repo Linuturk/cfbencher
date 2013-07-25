@@ -16,7 +16,6 @@ def upload_random_obj(cf, container, length):
     text = pyrax.utils.random_name(length=length)
     name = pyrax.utils.random_name(ascii_only=True)
     chksum = pyrax.utils.get_checksum(text)
-    logging.debug("Uploading {0}".format(name))
     obj = cf.store_object(container, name, text, etag=chksum)
     if chksum != obj.etag:
         logging.error("Checksum Mismatch!")
@@ -61,7 +60,6 @@ def fetch_benchmark(cf, container, n, chunk_size=8192):
             obj_gen = obj.fetch(chunk_size=chunk_size)
             output = "".join(obj_gen)
             chksum = pyrax.utils.get_checksum(output)
-            logging.debug("Fetched {0}".format(obj.name))
             if chksum != obj.etag:
                 mismatch += 1
                 logging.error("Checksum mismatch!")
